@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HMS — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0f1e;
+      --surface:   #111827;
+      --surface2:  #1f2937;
+      --border:    #1e293b;
+      --border-focus: #3b82f6;
+      --text:      #f1f5f9;
+      --muted:     #64748b;
+      --muted2:    #94a3b8;
+      --blue:      #3b82f6;
+      --blue-dark: #2563eb;
+      --blue-glow: rgba(59,130,246,0.25);
+      --success:   #22c55e;
+      --danger:    #ef4444;
+      --radius:    12px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+    }
+
+    /* ── Left panel ── */
+    .left-panel {
+      flex: 1;
+      background: linear-gradient(145deg, #0a0f1e 0%, #0d1b3e 40%, #0a1628 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative blobs */
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+      top: -100px; left: -100px;
+      border-radius: 50%;
+    }
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      border-radius: 50%;
+    }
+
+    .left-panel__content { position: relative; z-index: 1; max-width: 480px; }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+    .brand__icon {
+      width: 48px; height: 48px;
+      background: var(--blue);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 0 24px var(--blue-glow);
+    }
+    .brand__name { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+    .brand__sub  { font-size: 0.75rem; color: var(--muted2); margin-top: 0.1rem; }
+
+    .left-panel h2 {
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+    .left-panel h2 span { color: var(--blue); }
+
+    .left-panel p {
+      color: var(--muted2);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      font-size: 0.875rem;
+      color: var(--muted2);
+    }
+    .feature-item__icon {
+      width: 34px; height: 34px;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Right panel ── */
+    .right-panel {
+      width: 480px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 2rem;
+      border-left: 1px solid var(--border);
+    }
+
+    .auth-card { width: 100%; max-width: 380px; }
+
+    .auth-card__header { margin-bottom: 2rem; }
+    .auth-card__header h3 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.35rem; }
+    .auth-card__header p  { font-size: 0.875rem; color: var(--muted2); }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 1.75rem;
+      gap: 4px;
+    }
+    .tab {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 0.55rem;
+      border-radius: 7px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 2px 8px var(--blue-glow);
+    }
+
+    /* Form fields */
+    .field { margin-bottom: 1rem; }
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted2);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.02em;
+    }
+    .field-wrap { position: relative; }
+    .field-wrap .field-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 0.95rem;
+      pointer-events: none;
+    }
+    .field input, .field select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      padding: 0.7rem 0.85rem 0.7rem 2.5rem;
+      border-radius: 9px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--blue-glow);
+    }
+    .field input::placeholder { color: var(--muted); }
+    .field select option { background: var(--surface2); }
+
+    /* Password toggle */
+    .toggle-pw {
+      position: absolute;
+      right: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0.2rem;
+      line-height: 1;
+    }
+    .toggle-pw:hover { color: var(--text); }
+
+    /* Two-column grid for register */
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.75rem; }
+
+    /* Submit button */
+    .submit-btn {
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 9px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .submit-btn:hover { background: var(--blue-dark); box-shadow: 0 4px 16px var(--blue-glow); }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Message */
+    .msg {
+      margin-top: 0.75rem;
+      font-size: 0.82rem;
+      min-height: 1.2em;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .msg.error { color: var(--danger); }
+    .msg.success { color: var(--success); }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Role pills */
+    .role-pills { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .role-pill {
+      flex: 1;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      color: var(--muted2);
+      padding: 0.5rem 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .role-pill.selected {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: rgba(59,130,246,0.08);
+    }
+
+    /* Hidden */
+    .hidden { display: none !important; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .left-panel { display: none; }
+      .right-panel { width: 100%; border-left: none; padding: 2rem 1.25rem; }
+      .auth-card { max-width: 440px; }
+    }
+
+    @media (max-width: 480px) {
+      .right-panel { padding: 1.5rem 1rem; align-items: flex-start; padding-top: 2.5rem; }
+      .field-row { grid-template-columns: 1fr; }
+      .role-pills { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Left branding panel -->
+  <div class="left-panel">
+    <div class="left-panel__content">
+      <div class="brand">
+        <div class="brand__icon">🏥</div>
+        <div>
+          <div class="brand__name">HMS Portal</div>
+          <div class="brand__sub">Hospital Management System</div>
+        </div>
+      </div>
+
+      <h2>Modern healthcare,<br/><span>simplified.</span></h2>
+      <p>One platform for patients, doctors, and administrators — managing appointments, records, prescriptions, and billing seamlessly.</p>
+
+      <div class="features">
+        <div class="feature-item"><div class="feature-item__icon">📅</div>Smart appointment scheduling with conflict detection</div>
+        <div class="feature-item"><div class="feature-item__icon">📋</div>Complete patient medical history & records</div>
+        <div class="feature-item"><div class="feature-item__icon">💊</div>Digital prescription management</div>
+        <div class="feature-item"><div class="feature-item__icon">🛏️</div>Real-time bed & ward availability</div>
+        <div class="feature-item"><div class="feature-item__icon">🧾</div>Automated billing & printable invoices</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="right-panel">
+    <div class="auth-card">
+
+      <div class="auth-card__header">
+        <h3 id="card-title">Welcome back</h3>
+        <p id="card-sub">Sign in to your HMS account</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" id="tab-login">Sign In</button>
+        <button class="tab" id="tab-register">Create Account</button>
+      </div>
+
+      <!-- ── Login Form ── -->
+      <form id="login-form" autocomplete="on">
+        <div class="field">
+          <label for="login-email">Email address</label>
+          <div class="field-wrap">
+            <span class="field-icon">✉️</span>
+            <input type="email" id="login-email" required placeholder="doctor@hospital.com" autocomplete="email" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input type="password" id="login-password" required placeholder="Enter your password" autocomplete="current-password" />
+            <button type="button" class="toggle-pw" onclick="togglePw('login-password',this)">👁</button>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn" id="login-btn">
+          <span>Sign In</span> <span>→</span>
+        </button>
+        <p class="msg" id="login-msg"></p>
+      </form>
+
+      <!-- ── Register Form ── -->
+      <form id="register-form" class="hidden" autocomplete="off">
+
+        <!-- Role selector -->
+        <div style="margin-bottom:1rem">
+          <label style="display:block;font-size:0.8rem;font-weight:500;color:var(--muted2);margin-bottom:0.5rem;letter-spacing:0.02em">I am a</label>
+          <div class="role-pills">
+            <button type="button" class="role-pill selected" data-role="patient" onclick="selectRole('patient')">🧑‍⚕️ Patient</button>
+            <button type="button" class="role-pill" data-role="doctor" onclick="selectRole('doctor')">👨‍⚕️ Doctor</button>
+            <button type="button" class="role-pill" data-role="admin" onclick="selectRole('admin')">🛡️ Admin</button>
+          </div>
+          <input type="hidden" id="reg-role" value="patient" />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="reg-name">Full Name</label>
+            <div class="field-wrap">
+              <span class="field-icon">👤</span>
+              <input type="text" id="reg-name" required placeholder="John Smith" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="reg-phone">Phone</label>
+            <div class="field-wrap">
+              <span class="field-icon">📱</span>
+              <input type="tel" id="reg-phone" placeholder="+91 98765 43210" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="reg-email">Email address</label>
+          <div class="field-wrap">
+            <span class="field-icon">✉️</span>
+            <input type="email" id="reg-email" required placeholder="you@hospital.com" />
+          </div>
+        </div>
+
+        <div class="field hidden" id="admin-code-field">
+          <label for="reg-admin-code">Admin Registration Code</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔑</span>
+            <input type="password" id="reg-admin-code" placeholder="Enter admin code" />
+          </div>
+        </div>
+
+        <div class="field hidden" id="spec-field">
+          <label for="reg-spec">Specialization</label>
+          <div class="field-wrap">
+            <span class="field-icon">🩺</span>
+            <input type="text" id="reg-spec" placeholder="e.g. Cardiology, Orthopedics" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="reg-password">Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input type="password" id="reg-password" required placeholder="Min 6 characters" autocomplete="new-password" />
+            <button type="button" class="toggle-pw" onclick="togglePw('reg-password',this)">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="reg-btn">
+          <span>Create Account</span> <span>→</span>
+        </button>
+        <p class="msg" id="reg-msg"></p>
+      </form>
+
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:8000';
+
+    // ── Redirect if already logged in ──
+    if (localStorage.getItem('hms_token')) location.href = 'index.html';
+
+    // ── Tab switching ──
+    document.getElementById('tab-login').onclick = () => switchTab('login');
+    document.getElementById('tab-register').onclick = () => switchTab('register');
+
+    function switchTab(t) {
+      const isLogin = t === 'login';
+      document.getElementById('login-form').classList.toggle('hidden', !isLogin);
+      document.getElementById('register-form').classList.toggle('hidden', isLogin);
+      document.getElementById('tab-login').classList.toggle('active', isLogin);
+      document.getElementById('tab-register').classList.toggle('active', !isLogin);
+      document.getElementById('card-title').textContent = isLogin ? 'Welcome back' : 'Create your account';
+      document.getElementById('card-sub').textContent = isLogin ? 'Sign in to your HMS account' : 'Join the HMS platform today';
+    }
+
+    // ── Role pills ──
+    function selectRole(r) {
+      document.getElementById('reg-role').value = r;
+      document.querySelectorAll('.role-pill').forEach(p => p.classList.toggle('selected', p.dataset.role === r));
+      document.getElementById('spec-field').classList.toggle('hidden', r !== 'doctor');
+      document.getElementById('admin-code-field').classList.toggle('hidden', r !== 'admin');
+    }
+
+    // ── Password toggle ──
+    function togglePw(id, btn) {
+      const inp = document.getElementById(id);
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      btn.textContent = show ? '🙈' : '👁';
+    }
+
+    // ── Login ──
+    document.getElementById('login-form').onsubmit = async e => {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      const msg = document.getElementById('login-msg');
+      btn.disabled = true;
+      btn.innerHTML = '<span>Signing in…</span>';
+      msg.textContent = '';
+      try {
+        const res = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('login-email').value.trim(),
+            password: document.getElementById('login-password').value,
+          }),
+        });
+        if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Login failed'); }
+        const d = await res.json();
+        localStorage.setItem('hms_token', d.token);
+        localStorage.setItem('hms_role', d.role);
+        localStorage.setItem('hms_name', d.name);
+        localStorage.setItem('hms_id', d.id || '');
+        location.href = 'index.html';
+      } catch (err) {
+        msg.textContent = '⚠ ' + err.message;
+        msg.className = 'msg error';
+        btn.disabled = false;
+        btn.innerHTML = '<span>Sign In</span><span>→</span>';
+      }
+    };
+
+    // ── Register ──
+    document.getElementById('register-form').onsubmit = async e => {
+      e.preventDefault();
+      const btn = document.getElementById('reg-btn');
+      const msg = document.getElementById('reg-msg');
+      btn.disabled = true;
+      btn.innerHTML = '<span>Creating account…</span>';
+      msg.textContent = '';
+      try {
+        const res = await fetch(`${API_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('reg-name').value.trim(),
+            email: document.getElementById('reg-email').value.trim(),
+            phone: document.getElementById('reg-phone').value.trim(),
+            role: document.getElementById('reg-role').value,
+            specialization: document.getElementById('reg-spec').value.trim(),
+            password: document.getElementById('reg-password').value,
+            admin_code: document.getElementById('reg-admin-code').value,
+          }),
+        });
+        if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Registration failed'); }
+        const d = await res.json();
+        localStorage.setItem('hms_token', d.token);
+        localStorage.setItem('hms_role', d.role);
+        localStorage.setItem('hms_name', d.name);
+        localStorage.setItem('hms_id', d.id || '');
+        location.href = 'index.html';
+      } catch (err) {
+        msg.textContent = '⚠ ' + err.message;
+        msg.className = 'msg error';
+        btn.disabled = false;
+        btn.innerHTML = '<span>Create Account</span><span>→</span>';
+      }
+    };
+  </script>
+</body>
+</html>

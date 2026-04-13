@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bill — HMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="no-print" style="background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)">
+    <a href="index.html" style="color:var(--blue);font-size:0.9rem;font-weight:600">← Back to HMS</a>
+    <button onclick="window.print()" class="btn btn--primary">🖨️ Print / Save PDF</button>
+  </div>
+
+  <div class="invoice-page">
+    <div id="bill-container"><p class="text-muted">Loading…</p></div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:8000';
+    const tok = () => localStorage.getItem('hms_token');
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function fmt(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
+    function fmtDate(s) { return s ? new Date(s).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'; }
+
+    async function load() {
+      const id = new URLSearchParams(location.search).get('id');
+      const el = document.getElementById('bill-container');
+      if (!id) { el.innerHTML = '<p class="error">No bill ID.</p>'; return; }
+      try {
+        const res = await fetch(`${API}/bill/${id}`, { headers: { 'Authorization': `Bearer ${tok()}` } });
+        if (!res.ok) throw new Error('Bill not found');
+        const b = await res.json();
+        el.innerHTML = `
+          <div class="invoice-box">
+            <div class="invoice-header">
+              <div>
+                <h2>🏥 HMS</h2>
+                <p style="color:var(--muted);font-size:0.85rem;margin-top:0.25rem">Hospital Management System</p>
+              </div>
+              <div class="invoice-meta">
+                <div>Bill No: <span>${esc(b.bill_number)}</span></div>
+                <div>Date: <span>${fmtDate(b.created_at)}</span></div>
+                <div>Status: <span class="badge ${b.status==='paid'?'badge--green':'badge--yellow'}">${esc(b.status)}</span></div>
+              </div>
+            </div>
+
+            <div class="invoice-section">
+              <h3>Patient</h3>
+              <p>${esc(b.patient_name)}</p>
+            </div>
+
+            <table class="invoice-table">
+              <thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead>
+              <tbody>
+                ${b.items.map(i => `<tr><td>${esc(i.description)}</td><td style="text-align:right">${fmt(i.amount)}</td></tr>`).join('')}
+              </tbody>
+            </table>
+
+            <div class="invoice-totals">
+              <p><span>Subtotal</span>&nbsp;&nbsp;<span>${fmt(b.subtotal)}</span></p>
+              <p><span>GST (5%)</span>&nbsp;&nbsp;<span>${fmt(b.tax)}</span></p>
+              <p class="grand"><span>Total</span>&nbsp;&nbsp;<span>${fmt(b.total)}</span></p>
+            </div>
+
+            <div class="invoice-footer">
+              <p>Thank you for choosing our hospital. Get well soon.</p>
+            </div>
+          </div>`;
+      } catch (err) { el.innerHTML = `<p class="error">${esc(err.message)}</p>`; }
+    }
+    load();
+  </script>
+</body>
+</html>
